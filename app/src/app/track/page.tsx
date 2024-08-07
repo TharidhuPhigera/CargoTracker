@@ -89,7 +89,7 @@ const TrackCargo: React.FC = () => {
         </div>
       </header>
 
-      {cargoInfo && (
+      {cargoInfo ? (
         <section className="bg-gray-100 text-[#112D4E] py-20">
           <div className="container mx-auto flex flex-col items-center">
             <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
@@ -100,6 +100,26 @@ const TrackCargo: React.FC = () => {
               <p><strong>Estimated Delivery:</strong> {cargoInfo.estimatedDelivery}</p>
               <p><strong>Unit Count:</strong> {cargoInfo.unitCount}</p>
               <p><strong>Payment:</strong> {cargoInfo.payment}</p>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="bg-gray-100 text-[#112D4E] py-20">
+          <div className="container mx-auto flex flex-col items-center">
+            <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold mb-4 text-center">How to Track Your Cargo</h2>
+              <p className="mb-4 text-center">
+                Enter your reference number in the search bar above to get the latest updates on your cargo's status. 
+              </p>
+              <p className="mb-4 text-center">
+                You can track the shipment's status, origin, destination, estimated delivery date, unit count, and payment status.
+              </p>
+              <h3 className="text-xl font-bold mb-2 text-center">Why Track Your Cargo?</h3>
+              <ul className="list-disc list-inside text-center">
+                <li>Real-time updates on your shipment</li>
+                <li>Peace of mind knowing where your cargo is</li>
+                <li>Better planning and coordination</li>
+              </ul>
             </div>
           </div>
         </section>
