@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { FaSearch } from 'react-icons/fa';
 
 interface CargoInfo {
@@ -12,12 +12,9 @@ interface CargoInfo {
   payment: string;
 }
 
-const TrackCargo: React.FC = () => {
-  const router = useRouter();
+const CargoInfoComponent: React.FC = () => {
   const searchParams = useSearchParams();
-  const [referenceNumber, setReferenceNumber] = useState('');
   const [cargoInfo, setCargoInfo] = useState<CargoInfo | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const status = searchParams.get('status');
@@ -34,15 +31,36 @@ const TrackCargo: React.FC = () => {
         destination,
         estimatedDelivery,
         unitCount: parseInt(unitCount, 10),
-        payment
+        payment,
       });
     }
   }, [searchParams]);
 
+  if (!cargoInfo) {
+    return null;
+  }
+
+  return (
+    <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4">Cargo Information</h2>
+      <p><strong>Status:</strong> {cargoInfo.status}</p>
+      <p><strong>Origin:</strong> {cargoInfo.origin}</p>
+      <p><strong>Destination:</strong> {cargoInfo.destination}</p>
+      <p><strong>Estimated Delivery:</strong> {cargoInfo.estimatedDelivery}</p>
+      <p><strong>Unit Count:</strong> {cargoInfo.unitCount}</p>
+      <p><strong>Payment:</strong> {cargoInfo.payment}</p>
+    </div>
+  );
+};
+
+const TrackCargo: React.FC = () => {
+  const router = useRouter();
+  const [referenceNumber, setReferenceNumber] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
-    setCargoInfo(null);
 
     try {
       const response = await fetch(`/api/cargo?reference=${referenceNumber}`);
@@ -89,41 +107,29 @@ const TrackCargo: React.FC = () => {
         </div>
       </header>
 
-      {cargoInfo ? (
-        <section className="bg-gray-100 text-[#112D4E] py-20">
-          <div className="container mx-auto flex flex-col items-center">
-            <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold mb-4">Cargo Information</h2>
-              <p><strong>Status:</strong> {cargoInfo.status}</p>
-              <p><strong>Origin:</strong> {cargoInfo.origin}</p>
-              <p><strong>Destination:</strong> {cargoInfo.destination}</p>
-              <p><strong>Estimated Delivery:</strong> {cargoInfo.estimatedDelivery}</p>
-              <p><strong>Unit Count:</strong> {cargoInfo.unitCount}</p>
-              <p><strong>Payment:</strong> {cargoInfo.payment}</p>
-            </div>
+      <Suspense fallback={<div>Loading Cargo Information...</div>}>
+        <CargoInfoComponent />
+      </Suspense>
+
+      <section className="bg-gray-100 text-[#112D4E] py-20">
+        <div className="container mx-auto flex flex-col items-center">
+          <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold mb-4 text-center">How to Track Your Cargo</h2>
+            <p className="mb-4 text-center">
+              Enter your reference number in the search bar above to get the latest updates on your cargo's status.
+            </p>
+            <p className="mb-4 text-center">
+              You can track the shipment's status, origin, destination, estimated delivery date, unit count, and payment status.
+            </p>
+            <h3 className="text-xl font-bold mb-2 text-center">Why Track Your Cargo?</h3>
+            <ul className="list-disc list-inside text-center">
+              <li>Real-time updates on your shipment</li>
+              <li>Peace of mind knowing where your cargo is</li>
+              <li>Better planning and coordination</li>
+            </ul>
           </div>
-        </section>
-      ) : (
-        <section className="bg-gray-100 text-[#112D4E] py-20">
-          <div className="container mx-auto flex flex-col items-center">
-            <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold mb-4 text-center">How to Track Your Cargo</h2>
-              <p className="mb-4 text-center">
-                Enter your reference number in the search bar above to get the latest updates on your cargo's status. 
-              </p>
-              <p className="mb-4 text-center">
-                You can track the shipment's status, origin, destination, estimated delivery date, unit count, and payment status.
-              </p>
-              <h3 className="text-xl font-bold mb-2 text-center">Why Track Your Cargo?</h3>
-              <ul className="list-disc list-inside text-center">
-                <li>Real-time updates on your shipment</li>
-                <li>Peace of mind knowing where your cargo is</li>
-                <li>Better planning and coordination</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-      )}
+        </div>
+      </section>
     </div>
   );
 };
